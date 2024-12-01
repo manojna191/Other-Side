@@ -1,0 +1,32 @@
+id: classification_of_articles 
+namespace: newsProcessing
+
+tasks: 
+  - id: json
+    type: io.kestra.plugin.serdes.json.IonToJson
+    from: "{{ trigger.uris['postgres.order'] }}"
+
+  - id: python
+    type: io.kestra.plugin.scripts.python.Script
+    script: |
+      import json
+
+      with open("{{ outputs.json.uri }}", "r") as fopen:
+        data = json.load(fopen)
+
+      print(data)
+
+
+triggers:
+  - id: listen_debezium
+    type: io.kestra.plugin.debezium.postgres.Trigger
+    hostname: host.docker.internal
+    port: "5432"
+    username: postgres
+    password: myscretepassword
+    database: postgres
+    pluginName: PGOUTPUT
+    snapshotMode: INITIAL
+    format: INLINE
+    interval: PT30S
+

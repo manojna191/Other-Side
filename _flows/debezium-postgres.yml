@@ -4,7 +4,7 @@ namespace: newsProcessing
 tasks:
   - id: send_data
     type: io.kestra.plugin.core.log.Log
-    message: "{{trigger.data}}"
+    message: "{{trigger.data}} #data is changed"
 
 triggers:
   - id: realtime
@@ -14,6 +14,4 @@ triggers:
     port: 5432
     username: postgres
     password: mysecretpassword
-    includedColumns: guid
-    includedTables: news.news_articles
     
