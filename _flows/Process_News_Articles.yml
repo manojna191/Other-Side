@@ -26,13 +26,13 @@ tasks:
     sql: SELECT COALESCE(MAX(publish_date), '1970-01-01 00:00:00') AS max_publish_date FROM news.news_articles;
     fetchType: FETCH_ONE
 
-  - id: get_list_of_guids
+  - id: get_max_guid
     type: io.kestra.plugin.jdbc.postgresql.Query
     url: jdbc:postgresql://host.docker.internal:5432/
     username: postgres
     password: mysecretpassword
-    sql: SELECT guid FROM news.news_articles;
-    fetchType: FETCH
+    sql: SELECT COALESCE(MAX(guid), 0) AS max_guid FROM news.news_articles;
+    fetchType: FETCH_ONE
   
   - id: log
     type: io.kestra.plugin.core.log.Log
@@ -53,7 +53,7 @@ tasks:
       - pip install kestra
       - pip install beautifulsoup4
     commands: 
-      - python rssReader.py "{{outputs.get_max_publish_date.row.max_publish_date}}" "{{outputs.get_list_of_guids.rows}}"
+      - python rssReader.py "{{outputs.get_max_publish_date.row.max_publish_date}}" "{{outputs.get_max_guid.row.max_guid}}"
 
   - id: Insert_news_articles
     type: io.kestra.plugin.jdbc.postgresql.CopyIn

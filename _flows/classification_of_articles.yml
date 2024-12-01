@@ -4,7 +4,7 @@ namespace: newsProcessing
 tasks: 
   - id: json
     type: io.kestra.plugin.serdes.json.IonToJson
-    from: "{{ trigger.uris['postgres.order'] }}"
+    from: "{{ trigger.uris['news.news_articles'] }}"
 
   - id: python
     type: io.kestra.plugin.scripts.python.Script
