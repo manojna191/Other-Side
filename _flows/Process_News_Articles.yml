@@ -1,7 +1,7 @@
 id: Process_News_Articles
 namespace: newsProcessing
 
-description: This workflow is usefull for getting the news articles and pushing to the RabbitMq
+description: This workflow is usefull for getting the news articles using rss feed, scrpaing them and uploading to a database
 
 tasks:
   - id: create_schema
