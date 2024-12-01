@@ -18,17 +18,17 @@ tasks:
     password: mysecretpassword
     sql: CREATE TABLE IF NOT EXISTS news.news_articles (guid INTEGER PRIMARY KEY,title VARCHAR(500) NOT NULL,content TEXT NOT NULL,link TEXT NOT NULL,publish_date VARCHAR(50) NOT NULL,source VARCHAR(255),created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
   
-  - id: get_max_publish_date
+  - id: get_max_guid
     type: io.kestra.plugin.jdbc.postgresql.Query
     url: jdbc:postgresql://host.docker.internal:5432/
     username: postgres
     password: mysecretpassword
-    sql: SELECT COALESCE(MAX(publish_date), '1970-01-01T00:00:00') AS max_publish_date FROM news.news_articles;
+    sql: SELECT COALESCE(MAX(guid), 0) AS max_guid FROM news.news_articles;
     fetchType: FETCH_ONE
   
   - id: log
     type: io.kestra.plugin.core.log.Log
-    message: "{{outputs.get_max_publish_date.row.max_publish_date}}"
+    message: "{{outputs.get_max_guid.row.max_guid}}"
 
   - id: fetch_data
     type: io.kestra.plugin.scripts.python.Commands
@@ -45,7 +45,7 @@ tasks:
       - pip install kestra
       - pip install beautifulsoup4
     commands: 
-      - python rssReader.py "{{outputs.get_max_publish_date.row.max_publish_date}}"
+      - python rssReader.py "{{outputs.get_max_guid.row.max_guid}}"
 
   - id: Insert_news_articles
     type: io.kestra.plugin.jdbc.postgresql.CopyIn

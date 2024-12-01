@@ -1,0 +1,17 @@
+id: Classify_news_articles
+namespace: newsProcessing
+
+tasks:
+  - id: send_data
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ trigger.data }}"
+  
+
+triggers:
+  - id: realtime
+    type: io.kestra.plugin.debezium.postgres.RealtimeTrigger
+    database: postgres
+    hostname: host.docker.internal
+    port: "5432"
+    username: postgres
+    password: mysecretpassword
