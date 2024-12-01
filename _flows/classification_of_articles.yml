@@ -2,9 +2,29 @@ id: classification_of_articles
 namespace: newsProcessing
 
 tasks: 
-  - id: get_guids_timestamp
-    type: io.kestra.plugin.jdbc.postgresql.Query
-    url: jdbc:postgresql://host.docker.internal:5432/
+  - id: assing_Topic_and_Sentiment_to_article
+    type: io.kestra.plugin.scripts.node.Commands
+    namespaceFiles:
+      enabled: true
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: node:slim
+    warningOnStdErr: false
+    beforeCommands:
+      - npm install pg
+      - npm install axios
+    commands:
+      - node classifierAndLoader.js '{{kv('chatgpt_key')}}'
+
+triggers: 
+  - id: listen_postgresDb
+    type: io.kestra.plugin.debezium.postgres.Trigger
+    hostname: host.docker.internal
+    port: "5432"
     username: postgres
     password: mysecretpassword
-    sql: SELECT guid, created_at FROM news.news_articles WHERE created_at > {{kv('prev_created_at')}}
+    database: postgres
+    pluginName: PGOUTPUT
+    snapshotMode: INITIAL
+    format: INLINE
+    interval: PT10M
